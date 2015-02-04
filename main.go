@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/cloudfoundry/noaa"
 	"github.com/cloudfoundry/noaa/events"
@@ -114,6 +115,10 @@ func getToken(username, password string) (string, error) {
 
 	if response.Error.Error != "" {
 		return "", errors.New(fmt.Sprintf("%s %s", response.Error.Error, response.Error.ErrorDescription))
+	}
+
+	if !strings.Contains(response.Scope, "doppler.firehose") {
+		return "", errors.New(fmt.Sprintf("%s does not have doppler.firehose scope", username))
 	}
 
 	return fmt.Sprintf("%s %s", response.TokenType, response.AccessToken), nil
